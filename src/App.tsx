@@ -526,17 +526,7 @@ export default function App() {
       {/* Top Professional Mixology Header Bar - Hides during system print */}
       <header className="sticky top-0 z-30 bg-brand-bg/95 backdrop-blur-md border-b border-brand-border px-4 py-4 md:px-8 print:hidden flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-600 to-amber-400 p-[1.5px] shadow-lg shadow-amber-500/10 flex items-center justify-center">
-            <div className="w-full h-full bg-brand-bg rounded-[10px] flex items-center justify-center text-brand-accent font-bold text-base font-mono">
-              ★
-            </div>
-          </div>
-          <div>
-            <h1 className="text-sm font-bold text-brand-text-primary tracking-tight flex items-center gap-1.5 uppercase font-mono">
-              Mixology Manager
-            </h1>
-            <p className="text-[10px] text-brand-text-secondary font-medium">CONTRATOS & GESTÃO COMPLETA</p>
-          </div>
+          <img src="/icon.png" alt="Mixology Logo" className="h-10" />
         </div>
 
         {/* Quick status bar */}
@@ -579,10 +569,8 @@ export default function App() {
                   {/* Dynamic greeting title */}
                   <div className="flex flex-col gap-1">
                     <h2 className="text-xl font-bold tracking-tight text-zinc-150 flex items-center gap-1.5 font-sans">
-                      Dossiê da Bartender
-                      <Sparkles className="w-4.5 h-4.5 text-amber-500 animate-pulse shrink-0" />
+                      Dashboard
                     </h2>
-                    <p className="text-xs text-zinc-400">O que temos planejado de orçamentos e celebrações para hoje</p>
                   </div>
 
                   {/* Financial Metrics Cards banner */}

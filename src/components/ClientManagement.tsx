@@ -210,8 +210,7 @@ export default function ClientManagement({
           {/* Header Action shelf */}
           <div className="w-full flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h2 className="text-xl font-bold text-brand-text-primary tracking-tight font-sans">Fichário de Clientes</h2>
-              <p className="text-xs text-brand-text-secondary">Cadastre e acompanhe os dados de contato de seus contratantes</p>
+              <h2 className="text-xl font-bold text-brand-text-primary tracking-tight font-sans">Clientes</h2>
             </div>
             
             <button

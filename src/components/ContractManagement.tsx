@@ -76,63 +76,54 @@ export default function ContractManagement({
           {filteredContracts.map(c => (
             <div
               key={c.id}
-              className="bg-brand-surface border border-brand-border rounded-2xl p-4 flex flex-col justify-between hover:border-brand-border/60 transition shadow-md"
+              className="bg-brand-surface border border-brand-border rounded-xl p-3.5 flex flex-col justify-between active:scale-[0.98] transition-transform shadow-sm"
             >
-              {/* Expand contract template details sheet */}
               <div 
                 onClick={() => onSelectContract(c.id)}
                 className="cursor-pointer group flex-1"
               >
-                <div className="flex items-start gap-3 mb-3">
-                  <div className="p-2.5 bg-brand-accent/10 text-brand-accent rounded-xl border border-brand-accent/15 shrink-0 animate-none">
-                    <FileText className="w-5 h-5" />
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-brand-accent/10 text-brand-accent rounded-full border border-brand-accent/20 flex items-center justify-center shrink-0">
+                    <FileText className="w-4.5 h-4.5" />
                   </div>
-                  <div className="min-w-0">
-                    <h3 className="text-xs font-bold text-brand-text-primary group-hover:text-brand-accent transition line-clamp-1 leading-snug">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-[13px] font-bold text-brand-text-primary group-hover:text-brand-accent transition line-clamp-1">
                        {c.title}
                     </h3>
                     <span className="text-[10px] text-brand-text-secondary font-mono">Emissão: {c.date}</span>
                   </div>
+                  <div className="shrink-0 p-1.5 bg-brand-bg rounded-full text-brand-text-secondary border border-brand-border/40">
+                    <Eye className="w-3.5 h-3.5" />
+                  </div>
                 </div>
 
-                <div className="flex flex-col gap-1 text-[11px] text-brand-text-secondary mt-2 pt-2 border-t border-brand-border/40 font-mono">
-                  <span className="flex items-center gap-1.5 truncate">
-                    <User className="w-3 h-3 text-brand-text-secondary shrink-0" />
-                    Cliente: <b>{c.clientName}</b>
+                <div className="bg-brand-bg/50 rounded-lg p-2.5 mt-3 border border-brand-border/40 flex flex-col gap-1.5">
+                  <span className="flex items-center gap-2 text-[11px] text-brand-text-primary truncate">
+                    <User className="w-3.5 h-3.5 text-brand-text-secondary shrink-0" />
+                    <span className="truncate flex-1"><b>{c.clientName}</b></span>
                   </span>
-                  <span className="flex items-center gap-1.5 truncate">
-                    <Calendar className="w-3 h-3 text-brand-text-secondary shrink-0" />
-                    Evento: {c.eventName}
+                  <span className="flex items-center gap-2 text-[11px] text-brand-text-primary truncate">
+                    <Calendar className="w-3.5 h-3.5 text-brand-text-secondary shrink-0" />
+                    <span className="truncate flex-1">{c.eventName}</span>
                   </span>
                 </div>
               </div>
 
-              {/* Bottom control row */}
-              <div className="flex items-center justify-between border-t border-brand-border/60 mt-4 pt-3 shrink-0 gap-2">
+              <div className="flex items-center gap-2 mt-3 pt-3 border-t border-brand-border/50">
                 <button
                   onClick={() => onSelectContract(c.id)}
-                  className="text-[10px] text-brand-accent hover:text-brand-accent/80 font-bold transition flex items-center gap-1 group/btn cursor-pointer"
+                  className="flex-1 py-2 bg-brand-accent text-brand-bg rounded-lg text-[11px] font-bold shadow-sm active:bg-brand-accent/80 transition flex items-center justify-center gap-1.5"
                 >
-                  Abrir Editor A4
-                  <ArrowUpRight className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
+                  <FileText className="w-3.5 h-3.5" />
+                  Visualizar Contrato
                 </button>
 
-                <div className="flex items-center gap-1">
-                  <button
-                    onClick={() => onSelectContract(c.id)}
-                    className="p-1.5 hover:bg-brand-bg rounded-lg text-brand-text-secondary hover:text-brand-text-primary transition cursor-pointer"
-                    title="Imprimir / PDF"
-                  >
-                    <Eye className="w-3.5 h-3.5" />
-                  </button>
-                  <button
-                    onClick={() => setDeleteConfirmId(c.id)}
-                    className="p-1.5 hover:bg-red-950/20 rounded-lg text-brand-text-secondary hover:text-red-400 transition cursor-pointer"
-                    title="Excluir"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                </div>
+                <button
+                  onClick={() => setDeleteConfirmId(c.id)}
+                  className="px-3 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 rounded-lg transition active:bg-red-500/30 shrink-0 flex items-center justify-center"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
               </div>
             </div>
           ))}
