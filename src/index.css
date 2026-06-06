@@ -2,16 +2,39 @@
 
 @theme {
   --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --color-brand-bg: #0d0d0d;
-  --color-brand-surface: #1a1a1a;
-  --color-brand-accent: #f59e0b;
-  --color-brand-border: rgba(255, 255, 255, 0.1);
-  --color-brand-text-primary: #ffffff;
-  --color-brand-text-secondary: #a1a1aa;
+  --color-brand-bg: var(--color-brand-bg-val);
+  --color-brand-surface: var(--color-brand-surface-val);
+  --color-brand-accent: var(--color-brand-accent-val);
+  --color-brand-border: var(--color-brand-border-val);
+  --color-brand-text-primary: var(--color-brand-text-primary-val);
+  --color-brand-text-secondary: var(--color-brand-text-secondary-val);
+}
+
+:root {
+  --color-brand-bg-val: #f9fafb;
+  --color-brand-surface-val: #ffffff;
+  --color-brand-accent-val: #f59e0b;
+  --color-brand-border-val: rgba(0, 0, 0, 0.1);
+  --color-brand-text-primary-val: #18181b;
+  --color-brand-text-secondary-val: #71717a;
+}
+
+.dark {
+  --color-brand-bg-val: #0d0d0d;
+  --color-brand-surface-val: #1a1a1a;
+  --color-brand-accent-val: #f59e0b;
+  --color-brand-border-val: rgba(255, 255, 255, 0.1);
+  --color-brand-text-primary-val: #ffffff;
+  --color-brand-text-secondary-val: #a1a1aa;
 }
 
 body {
-  background-color: var(--color-brand-bg);
-  color: var(--color-brand-text-primary);
+  background-color: var(--color-brand-bg-val);
+  color: var(--color-brand-text-primary-val);
   font-family: var(--font-sans);
+}
+
+::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
 }

@@ -25,7 +25,7 @@ const CONTRACT_TEMPLATE = `CONTRATO DE PRESTAÇÃO DE SERVIÇOS DE BARMAN E COQU
 Este instrumento particular regula os serviços de barman e coquetelaria profissional para eventos celebrados entre:
 
 CONTRATADA:
-[NOME EM PREENDEDORA / MIXOLOGY], pessoa jurídica/física inscrita no CPF/CNPJ sob o nº _____________________, sediada em [Cidade/UF], contato corporativo.
+{{PERFIL_NOME}}, pessoa jurídica/física inscrita no CPF/CNPJ sob o nº _____________________, sediada em [Cidade/UF], contato corporativo.
 
 CONTRATANTE:
 Nome: {{CLIENTE_NOME}}
@@ -47,7 +47,7 @@ A Contratada manterá comportamento profissional e elegante com todos os convida
 Porto Alegre/RS, {{DATA_ATUAL}}
 
 ________________________________________________
-Contratada (Mixology Bar)
+Contratada ({{PERFIL_NOME}})
 
 ________________________________________________
 Contratante ({{CLIENTE_NOME}})`;
@@ -101,7 +101,10 @@ export default function A4Editor({
     
     if (!client || !event) return;
 
+    const savedProfileName = localStorage.getItem('mix_profile_name') || 'Mixology Eventos';
+
     let compiled = CONTRACT_TEMPLATE;
+    compiled = compiled.replace(/{{PERFIL_NOME}}/g, savedProfileName);
     compiled = compiled.replace(/{{CLIENTE_NOME}}/g, client.name);
     compiled = compiled.replace(/{{CLIENTE_EMAIL}}/g, client.email || 'Não informado');
     compiled = compiled.replace(/{{CLIENTE_TELEFONE}}/g, client.phone || 'Não informado');
@@ -129,7 +132,10 @@ export default function A4Editor({
 
   // Preset custom standard terms if blank
   const loadStandardBlank = () => {
+    const savedProfileName = localStorage.getItem('mix_profile_name') || 'Mixology Eventos';
+
     setContent(CONTRACT_TEMPLATE
+      .replace(/{{PERFIL_NOME}}/g, savedProfileName)
       .replace(/{{CLIENTE_NOME}}/g, "___________________________")
       .replace(/{{CLIENTE_EMAIL}}/g, "___________________________")
       .replace(/{{CLIENTE_TELEFONE}}/g, "___________________________")
@@ -361,10 +367,10 @@ export default function A4Editor({
             </div>
           ) : (
             /* Elegant physical simulated A4 Sheet paper preview - Used also for PRINTING! */
-            <div className="flex justify-center w-full px-1 overflow-x-auto">
+            <div className="flex justify-center w-full px-1 overflow-x-auto overflow-y-hidden pb-4">
               <div 
                 id="a4-sheet"
-                className="w-full max-w-[210mm] aspect-[1/1.414] bg-white text-gray-900 shadow-2xl p-[18mm] rounded-sm md:rounded-md flex flex-col text-[11px] leading-relaxed relative print:-m-12 font-sans selection:bg-amber-100"
+                className="w-[210mm] min-w-[210mm] min-h-[297mm] bg-white text-gray-900 shadow-2xl p-[18mm] rounded-sm md:rounded-md flex flex-col text-[11px] leading-relaxed relative print:-m-12 font-sans selection:bg-amber-100 shrink-0"
               >
                 {/* Print Header Watermark Logo (for print sheets) */}
                 <div className="flex items-center justify-between border-b border-gray-200 pb-3 mb-6">

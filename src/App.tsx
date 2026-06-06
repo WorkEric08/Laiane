@@ -19,7 +19,8 @@ import A4Editor from './components/A4Editor';
 import { 
   LayoutDashboard, Users, Calendar, DollarSign, FileText, 
   Plus, ArrowRight, UserPlus, CalendarPlus, BadgeDollarSign, 
-  Sparkles, Zap, Smartphone, CheckCircle, AlertTriangle 
+  Sparkles, Zap, Smartphone, CheckCircle, AlertTriangle,
+  Settings, Moon, Sun, RefreshCw, Github
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -204,6 +205,26 @@ export default function App() {
   const [clientForm, setClientForm] = useState({ name: '', phone: '', email: '', notes: '' });
   const [eventForm, setEventForm] = useState({ name: '', clientId: '', date: '', location: '', drinkPackage: 'Premium Completo', guestCount: 100, price: 0 });
   const [paymentForm, setPaymentForm] = useState({ clientId: '', eventId: '', amount: 0, dueDate: '', status: 'pendente' as 'pago' | 'pendente' | 'atrasado', notes: '' });
+
+  // Settings & Theme State
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [profileName, setProfileName] = useState(() => localStorage.getItem('mix_profile_name') || '');
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    const saved = localStorage.getItem('mix_theme');
+    if (saved) return saved === 'dark';
+    return document.documentElement.classList.contains('dark');
+  });
+
+  // Theme Sync
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('mix_theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('mix_theme', 'light');
+    }
+  }, [isDarkMode]);
 
   // Sync to local storage
   useEffect(() => {
@@ -524,17 +545,28 @@ export default function App() {
     <div id="pwa-app-root" className="min-h-screen bg-brand-bg text-brand-text-primary flex flex-col font-sans selection:bg-brand-accent/20">
       
       {/* Top Professional Mixology Header Bar - Hides during system print */}
-      <header className="sticky top-0 z-30 bg-brand-bg/95 backdrop-blur-md border-b border-brand-border px-4 py-4 md:px-8 print:hidden flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <img src="/icon.png" alt="Mixology Logo" className="h-10" />
-        </div>
+      {navigation.tab === 'dashboard' && !navigation.activeContractEditorId && (
+        <header className="sticky top-0 z-30 bg-brand-bg/95 backdrop-blur-md border-b border-brand-border px-4 py-4 md:px-8 print:hidden flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <img src="/icon.png" alt="Mixology Logo" className="h-10" />
+          </div>
 
-        {/* Quick status bar */}
-        <div className="hidden sm:flex items-center gap-2 bg-brand-surface border border-brand-border p-1 px-3 rounded-full text-[11px] text-brand-text-secondary">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-550 animate-pulse" />
-          Offline PWA Pronto para Festas
-        </div>
-      </header>
+          <div className="flex items-center gap-2">
+            {/* Quick status bar */}
+            <div className="hidden sm:flex items-center gap-2 bg-brand-surface border border-brand-border p-1 px-3 rounded-full text-[11px] text-brand-text-secondary mr-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              Offline PWA Pronto para Festas
+            </div>
+            
+            <button 
+              onClick={() => setIsSettingsOpen(true)}
+              className="p-2 bg-brand-surface border border-brand-border rounded-xl text-brand-text-secondary hover:text-brand-text-primary transition active:scale-95"
+            >
+              <Settings className="w-5 h-5" />
+            </button>
+          </div>
+        </header>
+      )}
 
       {/* Main Container viewport */}
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 md:px-8 py-6 pb-28 md:pb-12 h-full flex flex-col">
@@ -1123,6 +1155,81 @@ export default function App() {
             {navigation.bottomSheetAction === 'create' ? 'Registrar Recebimento' : 'Salvar Alterações'}
           </button>
         </form>
+      </BottomSheet>
+
+      {/* 4. SETTINGS BOTTOM SHEET */}
+      <BottomSheet
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        title="Configurações do Sistema"
+      >
+        <div className="flex flex-col gap-6">
+          {/* Theme Toggle */}
+          <div className="flex items-center justify-between p-4 bg-brand-surface rounded-xl border border-brand-border shadow-sm">
+            <div>
+              <h4 className="text-sm font-bold text-brand-text-primary">Aparência do PWA</h4>
+              <p className="text-xs text-brand-text-secondary mt-0.5">Mudar entre modo claro e escuro</p>
+            </div>
+            <button
+              onClick={() => setIsDarkMode(!isDarkMode)}
+              className="p-2.5 bg-brand-bg rounded-xl text-brand-text-secondary hover:text-brand-accent transition flex items-center justify-center border border-brand-border"
+            >
+              {isDarkMode ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
+            </button>
+          </div>
+
+          {/* Profile Name */}
+          <div className="flex flex-col gap-3">
+            <h4 className="text-sm font-bold text-brand-text-primary border-b border-brand-border pb-2">Seu Perfil (Contratos)</h4>
+            <div>
+              <label className="block text-xs font-semibold text-brand-text-secondary mb-1">Nome do Prestador/Responsável</label>
+              <input
+                type="text"
+                placeholder="Ex. Eric Fernando"
+                value={profileName}
+                onChange={(e) => setProfileName(e.target.value)}
+                className="w-full bg-brand-surface border border-brand-border text-brand-text-primary rounded-xl px-3 py-2.5 text-xs focus:ring-1 focus:ring-brand-accent focus:outline-none"
+              />
+            </div>
+            <button
+              onClick={() => {
+                localStorage.setItem('mix_profile_name', profileName);
+                setIsSettingsOpen(false);
+              }}
+              className="w-full py-2.5 bg-brand-accent hover:bg-brand-accent/90 text-brand-bg font-bold text-xs rounded-xl shadow-lg transition mt-1"
+            >
+              Salvar Perfil
+            </button>
+          </div>
+
+          {/* Dev Info (Easter Egg) */}
+          {profileName.toLowerCase() === 'devinfo' && (
+            <motion.div 
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              className="p-4 bg-blue-900/10 border border-blue-500/20 rounded-xl flex flex-col gap-3"
+            >
+              <div className="flex items-center gap-2 text-blue-500 border-b border-blue-500/20 pb-2">
+                <Github className="w-4 h-4" />
+                <h4 className="text-sm font-bold">Sobre o Desenvolvedor</h4>
+              </div>
+              
+              <div className="flex flex-col gap-1 text-xs">
+                <p className="text-brand-text-primary"><span className="text-blue-500/80 font-mono">Último commit:</span> d8f9e2a - "Ajustes PWA e UI"</p>
+                <p className="text-brand-text-primary"><span className="text-blue-500/80 font-mono">Data:</span> 06 de Junho de 2026</p>
+              </div>
+
+              <button
+                onClick={() => window.location.reload()}
+                className="mt-2 py-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs rounded-lg transition flex items-center justify-center gap-2"
+              >
+                <RefreshCw className="w-3.5 h-3.5" />
+                Forçar Atualização
+              </button>
+            </motion.div>
+          )}
+
+        </div>
       </BottomSheet>
 
     </div>
