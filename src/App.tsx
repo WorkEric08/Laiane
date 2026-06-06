@@ -854,7 +854,7 @@ export default function App() {
             }`}
           >
             <LayoutDashboard className="w-5 h-5 shrink-0" />
-            <span className="text-[9px] font-bold tracking-tight uppercase">Painel</span>
+            <span className="text-[9px] font-bold tracking-tight uppercase">Início</span>
           </button>
 
           <button
