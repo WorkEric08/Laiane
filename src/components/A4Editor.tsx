@@ -9,6 +9,7 @@ import {
   FileText, ArrowLeft, Printer, RefreshCw, CheckCircle, 
   Search, FileDown, Edit, Eye, Sparkles, BookOpen 
 } from 'lucide-react';
+import { CustomSelect } from './FormControls';
 
 interface A4EditorProps {
   clients: Client[];
@@ -209,7 +210,7 @@ export default function A4Editor({
           </div>
         </div>
 
-        <div className="flex items-center gap-2 self-end md:self-auto">
+        <div className="flex flex-wrap items-center gap-2 justify-end self-end md:self-auto w-full md:w-auto">
           {/* Mode switch buttons */}
           <div className="flex bg-brand-bg p-0.5 rounded-lg border border-brand-border">
             <button
@@ -269,37 +270,30 @@ export default function A4Editor({
             {/* Client bind dropdown */}
             <div className="mb-4">
               <label className="block text-xs font-semibold text-brand-text-secondary mb-1.5">Clientes cadastrados</label>
-              <div className="relative">
-                <select
-                  value={selectedClientId}
-                  onChange={(e) => {
-                    setSelectedClientId(e.target.value);
-                    setSelectedEventId('');
-                  }}
-                  className="w-full bg-brand-bg border border-brand-border text-brand-text-primary rounded-xl px-3 py-2.5 text-xs focus:ring-1 focus:ring-brand-accent focus:outline-none"
-                >
-                  <option value="">Selecione um cliente...</option>
-                  {clients.map(c => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
-                  ))}
-                </select>
-              </div>
+              <CustomSelect
+                value={selectedClientId}
+                onChange={(val: string) => {
+                  setSelectedClientId(val);
+                  setSelectedEventId('');
+                }}
+                options={[{ value: '', label: 'Selecione um cliente...' }, ...clients.map(c => ({ value: c.id, label: c.name }))]}
+                className="w-full bg-brand-bg border border-brand-border text-brand-text-primary rounded-xl px-3 py-2.5 text-xs focus:ring-1 focus:ring-brand-accent focus:outline-none"
+              />
             </div>
 
             {/* Event bind dropdown */}
             <div className="mb-5">
               <label className="block text-xs font-semibold text-brand-text-secondary mb-1.5">Eventos do cliente</label>
-              <select
+              <CustomSelect
                 value={selectedEventId}
-                onChange={(e) => setSelectedEventId(e.target.value)}
+                onChange={(val: string) => setSelectedEventId(val)}
                 disabled={!selectedClientId}
+                options={[
+                  { value: '', label: 'Selecione o evento ligado...' },
+                  ...filteredEventsForClient.map(ev => ({ value: ev.id, label: `${ev.name} (${ev.date})` }))
+                ]}
                 className="w-full bg-brand-bg border border-brand-border text-brand-text-primary rounded-xl px-3 py-2.5 text-xs focus:ring-1 focus:ring-brand-accent focus:outline-none disabled:opacity-40"
-              >
-                <option value="">Selecione o evento ligado...</option>
-                {filteredEventsForClient.map(ev => (
-                  <option key={ev.id} value={ev.id}>{ev.name} ({ev.date})</option>
-                ))}
-              </select>
+              />
               {!selectedClientId && (
                 <p className="text-[10px] text-brand-text-secondary/50 mt-1">Escolha o cliente para carregar seus eventos ativos.</p>
               )}

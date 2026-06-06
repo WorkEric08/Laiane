@@ -14,6 +14,7 @@ import EventManagement from './components/EventManagement';
 import PaymentManagement from './components/PaymentManagement';
 import ContractManagement from './components/ContractManagement';
 import A4Editor from './components/A4Editor';
+import { PhoneInput, CurrencyInput, CustomSelect, CustomDatePicker } from './components/FormControls';
 
 // Icons from lucide-react
 import { 
@@ -283,6 +284,11 @@ export default function App() {
       window.removeEventListener('popstate', handlePopState);
     };
   }, []);
+
+  // Scroll to top on screen change
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [navigation.tab, navigation.activeClientDetailId, navigation.activeEventDetailId, navigation.activeContractEditorId]);
 
   // Helper push navigator that adds history state items so the user has an actual backstack to pop from
   const triggerPushState = (metaType: string) => {
@@ -600,8 +606,8 @@ export default function App() {
                   
                   {/* Dynamic greeting title */}
                   <div className="flex flex-col gap-1">
-                    <h2 className="text-xl font-bold tracking-tight text-zinc-150 flex items-center gap-1.5 font-sans">
-                      Dashboard
+                    <h2 className="text-xl font-bold tracking-tight text-brand-text-primary flex items-center gap-1.5 font-sans">
+                      Início
                     </h2>
                   </div>
 
@@ -902,37 +908,37 @@ export default function App() {
         title={navigation.bottomSheetAction === 'create' ? 'Cadastrar Novo Cliente' : 'Editar Dados do Cliente'}
       >
         <form onSubmit={handleSaveClientForm} className="flex flex-col gap-4">
-          <div>
-            <label className="block text-xs font-semibold text-zinc-400 mb-1">Nome Completo</label>
-            <input
-              type="text"
-              required
-              placeholder="Ex. Helena Ribeiro Castro"
-              value={clientForm.name}
-              onChange={(e) => setClientForm(prev => ({ ...prev, name: e.target.value }))}
-              className="w-full bg-zinc-900 border border-zinc-800 text-zinc-150 rounded-xl px-3 py-2.5 text-xs focus:ring-1 focus:ring-amber-500 focus:outline-none"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
+          <div className="flex flex-col gap-3">
             <div>
-              <label className="block text-xs font-semibold text-zinc-400 mb-1">Whatsapp de Contato</label>
+              <label className="block text-xs font-semibold text-brand-text-secondary mb-1">Nome Completo</label>
               <input
                 type="text"
-                placeholder="Ex. (51) 99823-4554"
-                value={clientForm.phone}
-                onChange={(e) => setClientForm(prev => ({ ...prev, phone: e.target.value }))}
-                className="w-full bg-zinc-900 border border-zinc-800 text-zinc-150 rounded-xl px-3 py-2.5 text-xs focus:ring-1 focus:ring-amber-500 focus:outline-none"
+                required
+                placeholder="Ex. Helena Ribeiro Castro"
+                value={clientForm.name}
+                onChange={(e) => setClientForm(prev => ({ ...prev, name: e.target.value }))}
+                className="w-full bg-brand-bg border border-brand-border text-brand-text-primary rounded-xl px-3 py-2.5 text-xs focus:ring-1 focus:ring-brand-accent focus:outline-none"
               />
             </div>
+
             <div>
-              <label className="block text-xs font-semibold text-zinc-400 mb-1">E-mail</label>
+              <label className="block text-xs font-semibold text-brand-text-secondary mb-1">Whatsapp de Contato</label>
+              <PhoneInput
+                placeholder="Ex. (51) 99823-4554"
+                value={clientForm.phone}
+                onChange={(val: string) => setClientForm(prev => ({ ...prev, phone: val }))}
+                className="w-full bg-brand-bg border border-brand-border text-brand-text-primary rounded-xl px-3 py-2.5 text-xs focus:ring-1 focus:ring-brand-accent focus:outline-none"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-xs font-semibold text-brand-text-secondary mb-1">E-mail</label>
               <input
                 type="email"
                 placeholder="Ex. helena@email.com"
                 value={clientForm.email}
                 onChange={(e) => setClientForm(prev => ({ ...prev, email: e.target.value }))}
-                className="w-full bg-zinc-900 border border-zinc-800 text-zinc-150 rounded-xl px-3 py-2.5 text-xs focus:ring-1 focus:ring-amber-500 focus:outline-none"
+                className="w-full bg-brand-bg border border-brand-border text-brand-text-primary rounded-xl px-3 py-2.5 text-xs focus:ring-1 focus:ring-brand-accent focus:outline-none"
               />
             </div>
           </div>
@@ -965,19 +971,14 @@ export default function App() {
       >
         <form onSubmit={handleSaveEventForm} className="flex flex-col gap-4">
           <div>
-            <label className="block text-xs font-semibold text-zinc-400 mb-1">Unidade Contratante (Cliente)</label>
-            <select
-              required
+            <label className="block text-xs font-semibold text-brand-text-secondary mb-1">Unidade Contratante (Cliente)</label>
+            <CustomSelect
               disabled={navigation.bottomSheetAction === 'edit'}
               value={eventForm.clientId}
-              onChange={(e) => setEventForm(prev => ({ ...prev, clientId: e.target.value }))}
-              className="w-full bg-zinc-900 border border-zinc-800 text-zinc-150 rounded-xl px-3 py-2.5 text-xs focus:ring-1 focus:ring-amber-500 focus:outline-none disabled:opacity-40"
-            >
-              <option value="">Selecione quem está contratando...</option>
-              {clients.map(c => (
-                <option key={c.id} value={c.id}>{c.name}</option>
-              ))}
-            </select>
+              onChange={(val: string) => setEventForm(prev => ({ ...prev, clientId: val }))}
+              options={[{ value: '', label: 'Selecione quem está contratando...' }, ...clients.map(c => ({ value: c.id, label: c.name }))]}
+              className="w-full bg-brand-bg border border-brand-border text-brand-text-primary rounded-xl px-3 py-2.5 text-xs focus:ring-1 focus:ring-brand-accent focus:outline-none disabled:opacity-40"
+            />
           </div>
 
           <div>
@@ -992,25 +993,25 @@ export default function App() {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="flex flex-col gap-3">
             <div>
-              <label className="block text-xs font-semibold text-zinc-400 mb-1">Data Agendada</label>
-              <input
-                type="date"
+              <label className="block text-xs font-semibold text-brand-text-secondary mb-1">Data do Evento</label>
+              <CustomDatePicker
                 required
                 value={eventForm.date}
-                onChange={(e) => setEventForm(prev => ({ ...prev, date: e.target.value }))}
-                className="w-full bg-zinc-900 border border-zinc-800 text-zinc-150 rounded-xl px-3 py-2.5 text-xs focus:ring-1 focus:ring-amber-500 focus:outline-none"
+                onChange={(val: string) => setEventForm(prev => ({ ...prev, date: val }))}
+                className="w-full bg-brand-bg border border-brand-border text-brand-text-primary rounded-xl px-3 py-2.5 text-xs focus:ring-1 focus:ring-brand-accent focus:outline-none"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-zinc-400 mb-1">Quantidade de Convidados</label>
+              <label className="block text-xs font-semibold text-brand-text-secondary mb-1">Convidados</label>
               <input
                 type="number"
                 required
+                min="1"
                 value={eventForm.guestCount}
                 onChange={(e) => setEventForm(prev => ({ ...prev, guestCount: Number(e.target.value) }))}
-                className="w-full bg-zinc-900 border border-zinc-800 text-zinc-150 rounded-xl px-3 py-2.5 text-xs focus:ring-1 focus:ring-amber-500 focus:outline-none"
+                className="w-full bg-brand-bg border border-brand-border text-brand-text-primary rounded-xl px-3 py-2.5 text-xs focus:ring-1 focus:ring-brand-accent focus:outline-none"
               />
             </div>
           </div>
@@ -1026,28 +1027,28 @@ export default function App() {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="flex flex-col gap-3">
             <div>
-              <label className="block text-xs font-semibold text-zinc-400 mb-1">Plano de Bebidas / Menu</label>
-              <select
+              <label className="block text-xs font-semibold text-brand-text-secondary mb-1">Plano de Bebidas / Menu</label>
+              <CustomSelect
                 value={eventForm.drinkPackage}
-                onChange={(e) => setEventForm(prev => ({ ...prev, drinkPackage: e.target.value }))}
-                className="w-full bg-zinc-900 border border-zinc-800 text-zinc-150 rounded-xl px-3 py-2.5 text-xs focus:ring-1 focus:ring-amber-500 focus:outline-none"
-              >
-                <option value="Premium Completo 5 Horas">Premium Completo 5h</option>
-                <option value="Básico Caipirinhas & Gin 4 Horas">Básico Caipis & Gin 4h</option>
-                <option value="Somente Sem Álcool & Aperol">Sem Álcool & Aperol</option>
-                <option value="Customizado/Personalizado">Customizado Único</option>
-              </select>
+                onChange={(val: string) => setEventForm(prev => ({ ...prev, drinkPackage: val }))}
+                options={[
+                  { value: 'Premium Completo 5 Horas', label: 'Premium Completo 5h' },
+                  { value: 'Básico Caipirinhas & Gin 4 Horas', label: 'Básico Caipis & Gin 4h' },
+                  { value: 'Somente Sem Álcool & Aperol', label: 'Sem Álcool & Aperol' },
+                  { value: 'Customizado/Personalizado', label: 'Customizado Único' }
+                ]}
+                className="w-full bg-brand-bg border border-brand-border text-brand-text-primary rounded-xl px-3 py-2.5 text-xs focus:ring-1 focus:ring-brand-accent focus:outline-none"
+              />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-zinc-400 mb-1">Orçamento Cobrado (R$)</label>
-              <input
-                type="number"
+              <label className="block text-xs font-semibold text-brand-text-secondary mb-1">Orçamento Cobrado (R$)</label>
+              <CurrencyInput
                 required
                 value={eventForm.price}
-                onChange={(e) => setEventForm(prev => ({ ...prev, price: Number(e.target.value) }))}
-                className="w-full bg-zinc-900 border border-zinc-800 text-zinc-150 rounded-xl px-3 py-2.5 text-xs focus:ring-1 focus:ring-amber-500 focus:outline-none"
+                onChange={(val: number) => setEventForm(prev => ({ ...prev, price: val }))}
+                className="w-full bg-brand-bg border border-brand-border text-brand-text-primary rounded-xl px-3 py-2.5 text-xs focus:ring-1 focus:ring-brand-accent focus:outline-none"
               />
             </div>
           </div>
@@ -1069,72 +1070,62 @@ export default function App() {
       >
         <form onSubmit={handleSavePaymentForm} className="flex flex-col gap-4">
           <div>
-            <label className="block text-xs font-semibold text-zinc-400 mb-1">Cliente Associado</label>
-            <select
-              required
+            <label className="block text-xs font-semibold text-brand-text-secondary mb-1">Cliente Associado</label>
+            <CustomSelect
               disabled={navigation.bottomSheetAction === 'edit'}
               value={paymentForm.clientId}
-              onChange={(e) => setPaymentForm(prev => ({ ...prev, clientId: e.target.value, eventId: '' }))}
-              className="w-full bg-zinc-900 border border-zinc-800 text-zinc-150 rounded-xl px-3 py-2.5 text-xs focus:ring-1 focus:ring-amber-500 focus:outline-none disabled:opacity-40"
-            >
-              <option value="">Selecione o titular pagador...</option>
-              {clients.map(c => (
-                <option key={c.id} value={c.id}>{c.name}</option>
-              ))}
-            </select>
+              onChange={(val: string) => setPaymentForm(prev => ({ ...prev, clientId: val, eventId: '' }))}
+              options={[{ value: '', label: 'Selecione o titular pagador...' }, ...clients.map(c => ({ value: c.id, label: c.name }))]}
+              className="w-full bg-brand-bg border border-brand-border text-brand-text-primary rounded-xl px-3 py-2.5 text-xs focus:ring-1 focus:ring-brand-accent focus:outline-none disabled:opacity-40"
+            />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-zinc-400 mb-1">Evento Vinculado</label>
-            <select
-              required
+            <label className="block text-xs font-semibold text-brand-text-secondary mb-1">Evento Vinculado</label>
+            <CustomSelect
               value={paymentForm.eventId}
-              onChange={(e) => setPaymentForm(prev => ({ ...prev, eventId: e.target.value }))}
-              className="w-full bg-zinc-900 border border-zinc-800 text-zinc-150 rounded-xl px-3 py-2.5 text-xs focus:ring-1 focus:ring-amber-500 focus:outline-none disabled:opacity-40"
-            >
-              <option value="">Selecione a festa correspondente...</option>
-              {events
-                .filter(ev => !paymentForm.clientId || ev.clientId === paymentForm.clientId)
-                .map(ev => (
-                  <option key={ev.id} value={ev.id}>{ev.name}</option>
-                ))}
-            </select>
+              onChange={(val: string) => setPaymentForm(prev => ({ ...prev, eventId: val }))}
+              options={[
+                { value: '', label: 'Selecione a festa correspondente...' },
+                ...events.filter(ev => !paymentForm.clientId || ev.clientId === paymentForm.clientId).map(ev => ({ value: ev.id, label: ev.name }))
+              ]}
+              className="w-full bg-brand-bg border border-brand-border text-brand-text-primary rounded-xl px-3 py-2.5 text-xs focus:ring-1 focus:ring-brand-accent focus:outline-none disabled:opacity-40"
+            />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="flex flex-col gap-3">
             <div>
-              <label className="block text-xs font-semibold text-zinc-400 mb-1">Valor da Parcela (R$)</label>
-              <input
-                type="number"
+              <label className="block text-xs font-semibold text-brand-text-secondary mb-1">Valor da Parcela (R$)</label>
+              <CurrencyInput
                 required
                 value={paymentForm.amount}
-                onChange={(e) => setPaymentForm(prev => ({ ...prev, amount: Number(e.target.value) }))}
-                className="w-full bg-zinc-900 border border-zinc-800 text-zinc-150 rounded-xl px-3 py-2.5 text-xs focus:ring-1 focus:ring-amber-500 focus:outline-none"
+                onChange={(val: number) => setPaymentForm(prev => ({ ...prev, amount: val }))}
+                className="w-full bg-brand-bg border border-brand-border text-brand-text-primary rounded-xl px-3 py-2.5 text-xs focus:ring-1 focus:ring-brand-accent focus:outline-none"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-zinc-400 mb-1">Data de Vencimento</label>
-              <input
-                type="date"
+              <label className="block text-xs font-semibold text-brand-text-secondary mb-1">Data de Vencimento</label>
+              <CustomDatePicker
                 required
                 value={paymentForm.dueDate}
-                onChange={(e) => setPaymentForm(prev => ({ ...prev, dueDate: e.target.value }))}
-                className="w-full bg-zinc-900 border border-zinc-800 text-zinc-150 rounded-xl px-3 py-2.5 text-xs focus:ring-1 focus:ring-amber-500 focus:outline-none"
+                onChange={(val: string) => setPaymentForm(prev => ({ ...prev, dueDate: val }))}
+                className="w-full bg-brand-bg border border-brand-border text-brand-text-primary rounded-xl px-3 py-2.5 text-xs focus:ring-1 focus:ring-brand-accent focus:outline-none"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-zinc-400 mb-1">Status da Entrada</label>
-            <select
+            <label className="block text-xs font-semibold text-brand-text-secondary mb-1">Status da Entrada</label>
+            <CustomSelect
               value={paymentForm.status}
-              onChange={(e) => setPaymentForm(prev => ({ ...prev, status: e.target.value as any }))}
-              className="w-full bg-zinc-900 border border-zinc-800 text-zinc-150 rounded-xl px-3 py-2.5 text-xs focus:ring-1 focus:ring-amber-500 focus:outline-none"
-            >
-              <option value="pendente">Pendente / Aguardando</option>
-              <option value="pago">Quitado / Recebido</option>
-              <option value="atrasado">Atrasado em Cobrança</option>
-            </select>
+              onChange={(val: any) => setPaymentForm(prev => ({ ...prev, status: val }))}
+              options={[
+                { value: 'pendente', label: 'Pendente / Aguardando' },
+                { value: 'pago', label: 'Quitado / Recebido' },
+                { value: 'atrasado', label: 'Atrasado em Cobrança' }
+              ]}
+              className="w-full bg-brand-bg border border-brand-border text-brand-text-primary rounded-xl px-3 py-2.5 text-xs focus:ring-1 focus:ring-brand-accent focus:outline-none"
+            />
           </div>
 
           <div>

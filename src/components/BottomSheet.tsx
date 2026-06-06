@@ -55,14 +55,21 @@ export default function BottomSheet({
             className="absolute inset-0 bg-black/60 backdrop-blur-md"
           />
 
-          {/* Bottom Sheet Drawer Panel */}
           <motion.div
             ref={containerRef}
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-            className="relative z-10 w-full max-w-lg bg-brand-surface border-t border-brand-border rounded-t-3xl shadow-2xl overflow-hidden max-h-[88vh] flex flex-col"
+            drag="y"
+            dragConstraints={{ top: 0, bottom: 0 }}
+            dragElastic={{ top: 0, bottom: 1 }}
+            onDragEnd={(e, { offset, velocity }) => {
+              if (offset.y > 100 || velocity.y > 500) {
+                onClose();
+              }
+            }}
+            className="relative z-10 w-full max-w-lg bg-brand-surface border-t border-brand-border rounded-t-3xl shadow-2xl overflow-hidden max-h-[88vh] flex flex-col mt-auto"
           >
             {/* Native Drag Indicator and Header */}
             <div className="flex flex-col items-center pt-3 pb-4 px-6 border-b border-brand-border shrink-0">
