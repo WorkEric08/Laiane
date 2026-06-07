@@ -32,7 +32,13 @@ body {
   background-color: var(--color-brand-bg-val);
   color: var(--color-brand-text-primary-val);
   font-family: var(--font-sans);
-  overscroll-behavior-y: none;
+  /* PWA: Block pull-to-refresh and overscroll navigation in all directions */
+  overscroll-behavior: none;
+  /* iOS Safari: prevent callout on long-press */
+  -webkit-touch-callout: none;
+  /* Prevent accidental text selection (native app feel) */
+  -webkit-tap-highlight-color: transparent;
+  touch-action: pan-y;
 }
 
 ::-webkit-scrollbar {
