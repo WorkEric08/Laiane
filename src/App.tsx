@@ -607,7 +607,7 @@ export default function App() {
                   {/* Dynamic greeting title */}
                   <div className="flex flex-col gap-1">
                     <h2 className="text-xl font-bold tracking-tight text-brand-text-primary flex items-center gap-1.5 font-sans">
-                      Início
+                      Dashboard
                     </h2>
                   </div>
 
