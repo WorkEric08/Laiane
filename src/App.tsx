@@ -227,6 +227,86 @@ export default function App() {
     }
   }, [isDarkMode]);
 
+  // DevInfo GitHub Commit State
+  const [devInfoCommit, setDevInfoCommit] = useState({
+    message: 'Buscando do GitHub...',
+    date: '--/--',
+    time: '--:--:--',
+  });
+
+  useEffect(() => {
+    const term = profileName.toLowerCase().trim();
+    if (term === 'devinfo') {
+      let isMounted = true;
+      fetch('https://api.github.com/repos/WorkEric08/Laiane/commits')
+        .then(res => {
+          if (!res.ok) throw new Error('Network error');
+          return res.json();
+        })
+        .then(data => {
+          if (Array.isArray(data) && data.length > 0 && isMounted) {
+            const commitObj = data[0];
+            const msg = commitObj.commit.message || '';
+            const dateStr = commitObj.commit.committer?.date || commitObj.commit.author?.date || '';
+            
+            if (dateStr) {
+              const dateObj = new Date(dateStr);
+              const day = String(dateObj.getDate()).padStart(2, '0');
+              const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+              const dStr = `${day}/${month}`;
+              
+              const hours = String(dateObj.getHours()).padStart(2, '0');
+              const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+              const seconds = String(dateObj.getSeconds()).padStart(2, '0');
+              const tStr = `${hours}:${minutes}:${seconds}`;
+              
+              setDevInfoCommit({
+                message: msg,
+                date: dStr,
+                time: tStr
+              });
+            }
+          }
+        })
+        .catch(err => {
+          console.error('Erro ao buscar commit do GitHub:', err);
+          if (isMounted) {
+            setDevInfoCommit({
+              message: 'feat: configure PWA manifest, global styles, and native app-like constraints',
+              date: '06/06',
+              time: '21:05:02',
+            });
+          }
+        });
+      return () => {
+        isMounted = false;
+      };
+    }
+  }, [profileName]);
+
+  const handleForceUpdate = async () => {
+    try {
+      // Unregister Service Workers
+      if ('serviceWorker' in navigator) {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        for (const reg of registrations) {
+          await reg.unregister();
+        }
+      }
+      // Clear caches
+      if ('caches' in window) {
+        const cacheNames = await caches.keys();
+        for (const name of cacheNames) {
+          await caches.delete(name);
+        }
+      }
+      // Force reload with cache bypass query parameter
+      window.location.href = window.location.origin + window.location.pathname + '?cb=' + Date.now() + window.location.hash;
+    } catch (e) {
+      window.location.reload();
+    }
+  };
+
   // Sync to local storage
   useEffect(() => {
     localStorage.setItem('mix_clients', JSON.stringify(clients));
@@ -1195,28 +1275,53 @@ export default function App() {
 
           {/* Dev Info (Easter Egg) */}
           {profileName.toLowerCase() === 'devinfo' && (
-            <motion.div 
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              className="p-4 bg-blue-900/10 border border-blue-500/20 rounded-xl flex flex-col gap-3"
+            <motion.div
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2 }}
+              className="flex flex-col gap-0 overflow-hidden rounded-2xl border border-blue-500/25 bg-blue-950/20"
             >
-              <div className="flex items-center gap-2 text-blue-500 border-b border-blue-500/20 pb-2">
-                <Github className="w-4 h-4" />
-                <h4 className="text-sm font-bold">Sobre o Desenvolvedor</h4>
-              </div>
-              
-              <div className="flex flex-col gap-1 text-xs">
-                <p className="text-brand-text-primary"><span className="text-blue-500/80 font-mono">Último commit:</span> d8f9e2a - "Ajustes PWA e UI"</p>
-                <p className="text-brand-text-primary"><span className="text-blue-500/80 font-mono">Data:</span> 06 de Junho de 2026</p>
+              {/* Header */}
+              <div className="flex items-center gap-2.5 px-4 pt-4 pb-3 border-b border-blue-500/15">
+                <div className="p-1.5 bg-blue-500/15 rounded-lg text-blue-400">
+                  <Github className="w-4 h-4" />
+                </div>
+                <h4 className="text-sm font-extrabold tracking-tight text-blue-400">DevInfo</h4>
               </div>
 
-              <button
-                onClick={() => window.location.reload()}
-                className="mt-2 py-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs rounded-lg transition flex items-center justify-center gap-2"
-              >
-                <RefreshCw className="w-3.5 h-3.5" />
-                Forçar Atualização
-              </button>
+              {/* Commit info rows */}
+              <div className="flex flex-col divide-y divide-blue-500/10">
+                {/* Último commit */}
+                <div className="px-4 py-3 flex flex-col gap-0.5">
+                  <span className="text-[9px] font-bold uppercase tracking-widest text-blue-400/70">Último commit</span>
+                  <span className="text-xs text-brand-text-primary font-mono leading-relaxed break-words">
+                    {devInfoCommit.message || 'Carregando...'}
+                  </span>
+                </div>
+
+                {/* Data e Horário lado a lado */}
+                <div className="px-4 py-3 grid grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-[9px] font-bold uppercase tracking-widest text-blue-400/70">Data</span>
+                    <span className="text-xs text-brand-text-primary font-mono">{devInfoCommit.date}</span>
+                  </div>
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-[9px] font-bold uppercase tracking-widest text-blue-400/70">Horário</span>
+                    <span className="text-xs text-brand-text-primary font-mono">{devInfoCommit.time}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Force update button */}
+              <div className="px-4 pb-4 pt-2">
+                <button
+                  onClick={handleForceUpdate}
+                  className="w-full py-2.5 bg-blue-600 hover:bg-blue-500 active:scale-95 text-white font-bold text-xs rounded-xl transition-all duration-150 flex items-center justify-center gap-2 shadow-md shadow-blue-900/30"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" />
+                  Forçar Atualização
+                </button>
+              </div>
             </motion.div>
           )}
 
