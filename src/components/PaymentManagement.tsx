@@ -4,15 +4,16 @@
  */
 
 import React, { useState } from 'react';
-import { Payment } from '../types';
+import { Payment, Client } from '../types';
 import { 
-  DollarSign, Search, Calendar, ChevronRight, CheckCircle2,
-  AlertCircle, Clock, Trash2, Edit, Plus, Filter, CornerDownRight 
+  DollarSign, Search, CheckCircle2,
+  AlertCircle, Clock, Trash2, Edit, Plus, Filter, CornerDownRight, MessageCircle
 } from 'lucide-react';
 import { motion } from 'motion/react';
 
 interface PaymentManagementProps {
   payments: Payment[];
+  clients?: Client[];
   onAddPayment: () => void;
   onEditPayment: (payment: Payment) => void;
   onDeletePayment: (id: string) => void;
@@ -21,11 +22,21 @@ interface PaymentManagementProps {
 
 export default function PaymentManagement({
   payments,
+  clients = [],
   onAddPayment,
   onEditPayment,
   onDeletePayment,
   onMarkAsPaid,
 }: PaymentManagementProps) {
+
+  // Build WhatsApp deep link from phone digits
+  const getClientWhatsApp = (clientId: string) => {
+    const client = clients.find(c => c.id === clientId);
+    if (!client?.phone) return null;
+    const digits = client.phone.replace(/\D/g, '');
+    const number = digits.startsWith('55') ? digits : `55${digits}`;
+    return { link: `https://wa.me/${number}?text=${encodeURIComponent(`Olá ${client.name.split(' ')[0]}! Passando para avisar que identificamos um pagamento em atraso referente ao nosso contrato. Poderia me retornar assim que possível? 🙏`)}`, name: client.name };
+  };
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<'todos' | 'pago' | 'pendente' | 'atrasado'>('todos');
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
@@ -84,7 +95,7 @@ export default function PaymentManagement({
       {/* Top action metrics banner */}
       <div className="w-full flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-brand-text-primary tracking-tight font-sans">Controle de Entradas</h2>
+          <h2 className="text-xl font-bold text-brand-text-primary tracking-tight font-sans">Controle de Financeiro</h2>
           <p className="text-xs text-brand-text-secondary">Gerencie recebimentos de parcelas, depósitos e orçamentos globais</p>
         </div>
         
@@ -172,57 +183,79 @@ export default function PaymentManagement({
       {/* Grid structure of payments */}
       {filteredPayments.length > 0 ? (
         <div className="flex flex-col gap-3">
-          {filteredPayments.map(p => (
+          {filteredPayments.map(p => {
+            const wa = p.status === 'atrasado' ? getClientWhatsApp(p.clientId) : null;
+            return (
             <div
               key={p.id}
-              className="bg-brand-surface border border-brand-border p-4 rounded-2xl flex flex-col md:flex-row md:items-center md:justify-between gap-4 hover:border-brand-border/60 transition"
+              className={`bg-brand-surface border p-4 rounded-2xl flex flex-col gap-3 transition ${
+                p.status === 'atrasado'
+                  ? 'border-red-500/25 hover:border-red-500/40'
+                  : 'border-brand-border hover:border-brand-border/60'
+              }`}
             >
-              {/* Left group info */}
-              <div className="flex items-start gap-3.5 flex-1 min-w-0">
-                <div className={`p-3 rounded-xl border shrink-0 ${
+              {/* Top row: icon + amount + status badge + date */}
+              <div className="flex items-start gap-3.5">
+                <div className={`p-2.5 rounded-xl border shrink-0 mt-0.5 ${
                   p.status === 'pago' 
-                    ? 'bg-emerald-500/5 text-emerald-400 border-emerald-500/10' 
+                    ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/15' 
                     : p.status === 'atrasado'
-                    ? 'bg-red-500/5 text-red-400 border-red-500/10'
-                    : 'bg-brand-accent/5 text-brand-accent border-brand-accent/10'
+                    ? 'bg-red-500/10 text-red-400 border-red-500/15'
+                    : 'bg-brand-accent/10 text-brand-accent border-brand-accent/15'
                 }`}>
-                  <DollarSign className="w-5 h-5" />
+                  <DollarSign className="w-4 h-4" />
                 </div>
 
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-[#ffffff] font-bold text-sm tracking-tight truncate block font-mono">
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-wrap items-center gap-2 mb-1">
+                    <span className={`font-bold text-base tracking-tight font-mono ${
+                      p.status === 'pago' ? 'text-emerald-400' : p.status === 'atrasado' ? 'text-red-400' : 'text-brand-accent'
+                    }`}>
                       R$ {Number(p.amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                     </span>
                     {getStatusBadge(p.status)}
                   </div>
-                  
-                  <div className="text-xs text-brand-text-secondary font-medium font-sans">
-                    Contratante: <span className="text-brand-text-primary font-bold">{p.clientName}</span>
+                  <div className="text-xs text-brand-text-secondary font-sans">
+                    <span className="font-bold text-brand-text-primary">{p.clientName}</span>
                   </div>
-                  
-                  <div className="text-[11px] text-brand-text-secondary flex items-center gap-1 mt-0.5 font-mono">
-                    <CornerDownRight className="w-3.5 h-3.5 shrink-0 text-brand-text-secondary/50" />
-                    Evento: <span className="truncate">{p.eventName}</span>
+                  <div className="text-[10px] text-brand-text-secondary flex items-center gap-1 mt-0.5 font-mono truncate">
+                    <CornerDownRight className="w-3 h-3 shrink-0 opacity-50" />
+                    <span className="truncate">{p.eventName}</span>
                   </div>
                 </div>
-              </div>
 
-              {/* Right timing details & quick action controls */}
-              <div className="flex items-center justify-between md:justify-end gap-5 border-t border-brand-border/40 md:border-0 pt-3 md:pt-0 shrink-0">
-                <div className="text-left md:text-right text-[11px] text-brand-text-secondary font-mono">
-                  <span className="block text-brand-text-secondary/75">Vencimento</span>
-                  <span className="font-semibold text-brand-text-primary">{(() => {
+                {/* Vencimento - top right */}
+                <div className="text-right text-[10px] text-brand-text-secondary font-mono shrink-0">
+                  <span className="block text-brand-text-secondary/60 text-[9px] uppercase tracking-wider">Vencimento</span>
+                  <span className="font-bold text-brand-text-primary text-xs">{(() => {
                     const [year, m, d] = p.dueDate.split('-');
                     return `${d}/${m}/${year}`;
                   })()}</span>
                   {p.payDate && (
-                    <span className="block text-emerald-500 text-[10px] mt-0.5 font-bold">Pago em: {(() => {
+                    <span className="block text-emerald-500 text-[9px] mt-0.5 font-bold">✓ {(() => {
                       const [year, m, d] = p.payDate.split('-');
                       return `${d}/${m}/${year}`;
                     })()}</span>
                   )}
                 </div>
+              </div>
+
+              {/* Bottom row: actions */}
+              <div className="flex items-center justify-between border-t border-brand-border/30 pt-3 gap-2">
+                {/* WhatsApp button for overdue only */}
+                {p.status === 'atrasado' && wa ? (
+                  <a
+                    href={wa.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold text-[10px] rounded-xl transition-all duration-150 shadow-sm"
+                  >
+                    <MessageCircle className="w-3.5 h-3.5" />
+                    Cobrar via WhatsApp
+                  </a>
+                ) : (
+                  <div />
+                )}
 
                 <div className="flex items-center gap-2">
                   {p.status !== 'pago' && (
@@ -251,7 +284,7 @@ export default function PaymentManagement({
                 </div>
               </div>
             </div>
-          ))}
+          );})}
         </div>
       ) : (
         <div className="text-center py-16 bg-brand-surface border border-dashed border-brand-border text-xs text-brand-text-secondary rounded-2xl">

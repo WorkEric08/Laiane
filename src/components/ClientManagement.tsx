@@ -1,13 +1,8 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import React, { useState } from 'react';
 import { Client, CocktailEvent, Contract } from '../types';
 import { 
   Plus, Search, Phone, Mail, FileText, ChevronRight, 
-  Trash2, Edit, Calendar, AlertCircle, ArrowLeft, CheckCircle 
+  Trash2, Edit, Calendar, AlertCircle, ArrowLeft, CheckCircle, MessageCircle
 } from 'lucide-react';
 import { motion } from 'motion/react';
 
@@ -55,6 +50,13 @@ export default function ClientManagement({
     return contracts.filter(c => c.clientId === clientId);
   };
 
+  // Build WhatsApp link from phone number
+  const getWhatsAppLink = (phone: string) => {
+    const digits = phone.replace(/\D/g, '');
+    const number = digits.startsWith('55') ? digits : `55${digits}`;
+    return `https://wa.me/${number}`;
+  };
+
   const selectedClient = clients.find(c => c.id === selectedClientId);
 
   return (
@@ -85,14 +87,27 @@ export default function ClientManagement({
             <div className="md:col-span-1 bg-brand-surface border border-brand-border p-5 rounded-2xl flex flex-col gap-4">
               <h3 className="text-sm font-semibold text-brand-text-primary border-b border-brand-border pb-2">Informações de Contato</h3>
               
+              {/* Phone row + WhatsApp button */}
               <div className="flex items-center gap-3 text-brand-text-primary text-xs">
                 <div className="p-2 rounded-xl bg-brand-bg text-brand-accent border border-brand-border">
                   <Phone className="w-4 h-4" />
                 </div>
-                <div>
+                <div className="flex-1 min-w-0">
                   <span className="block text-brand-text-secondary font-medium">Telefone</span>
                   <span className="font-semibold">{selectedClient.phone || 'Não informado'}</span>
                 </div>
+                {selectedClient.phone && (
+                  <a
+                    href={getWhatsAppLink(selectedClient.phone)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold text-[10px] rounded-xl transition-all duration-150 shadow-md shadow-emerald-900/30"
+                    title="Abrir WhatsApp"
+                  >
+                    <MessageCircle className="w-3.5 h-3.5" />
+                    WhatsApp
+                  </a>
+                )}
               </div>
 
               <div className="flex items-center gap-3 text-brand-text-primary text-xs">

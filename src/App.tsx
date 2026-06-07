@@ -889,6 +889,7 @@ export default function App() {
               {navigation.tab === 'payments' && (
                 <PaymentManagement
                   payments={payments}
+                  clients={clients}
                   onAddPayment={() => handleOpenBottomSheet('payment', 'create')}
                   onEditPayment={(pay) => handleOpenBottomSheet('payment', 'edit', pay.id)}
                   onDeletePayment={handleDeletePayment}
@@ -964,7 +965,7 @@ export default function App() {
             }`}
           >
             <DollarSign className="w-5 h-5 shrink-0" />
-            <span className="text-[9px] font-bold tracking-tight uppercase">Entradas</span>
+            <span className="text-[9px] font-bold tracking-tight uppercase">Financeiro</span>
           </button>
 
           <button
